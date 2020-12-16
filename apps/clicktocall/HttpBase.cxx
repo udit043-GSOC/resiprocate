@@ -15,7 +15,6 @@
 #include "HttpConnection.hxx"
 #include "WebAdmin.hxx"
 #include <rutil/WinLeakCheck.hxx>
-#include <rutil/Errdes.hxx>
 
 using namespace clicktocall;
 using namespace resip;
@@ -63,7 +62,7 @@ HttpBase::HttpBase( int port, IpVersion ipVer, const Data& realm ):
    if ( mFd == INVALID_SOCKET )
    {
       int e = getErrno();
-      ErrLog (<< "Failed to create socket: " << ErrnoError::SearchErrorMsg(e) );
+      ErrLog (<< "Failed to create socket: " << strerror(e));
       sane = false;
       return;
    }
@@ -79,7 +78,7 @@ HttpBase::HttpBase( int port, IpVersion ipVer, const Data& realm ):
 #endif
    {
       int e = getErrno();
-      ErrLog (<< "Couldn't set sockoptions SO_REUSEPORT | SO_REUSEADDR: " << ErrnoError::SearchErrorMsg(e) );
+      ErrLog (<< "Couldn't set sockoptions SO_REUSEPORT | SO_REUSEADDR: " << strerror(e));
       sane = false;
       return;
    }
@@ -89,14 +88,13 @@ HttpBase::HttpBase( int port, IpVersion ipVer, const Data& realm ):
    if ( ::bind( mFd, &mTuple.getMutableSockaddr(), mTuple.length()) == SOCKET_ERROR )
    {
       int e = getErrno();
-      DebugLog ( << ErrnoError::SearchErrorMsg(e) );
       if ( e == EADDRINUSE )
       {
          ErrLog (<< mTuple << " already in use ");
       }
       else
       {
-         ErrLog (<< "Could not bind to " << mTuple << " " << ErrnoError::SearchErrorMsg(e) );
+         ErrLog (<< "Could not bind to " << mTuple);
       }
       sane = false;
       return;
@@ -118,7 +116,7 @@ HttpBase::HttpBase( int port, IpVersion ipVer, const Data& realm ):
    if (e != 0 )
    {
       int e = getErrno();
-      InfoLog (<< "Failed listen " << ErrnoError::SearchErrorMsg(e) );
+      InfoLog (<< "Failed listen " << strerror(e));
       sane = false;
       return;
    }
@@ -152,13 +150,12 @@ HttpBase::process(FdSet& fdset)
       if ( sock == SOCKET_ERROR )
       {
          int e = getErrno();
-         DebugLog ( << ErrnoError::SearchErrorMsg(e) );
          switch (e)
          {
             case EWOULDBLOCK:
                return;
             default:
-               ErrLog(<< "Some error reading from socket: " << ErrnoError::SearchErrorMsg(e) );
+               ErrLog(<< "Some error reading from socket: " << e);
          }
          return;
       }

@@ -27,7 +27,6 @@
 #include "rutil/ParseBuffer.hxx"
 #include "rutil/FileSystem.hxx"
 #include "rutil/WinLeakCheck.hxx"
-#include "rutil/Errdes.hxx"
 
 #include "rutil/ssl/SHA1Stream.hxx"
 
@@ -266,7 +265,7 @@ Security::preload()
       if(stat(fileName.c_str(), &s) < 0)
       {
          ErrLog(<<"Error calling stat() for " << fileName.c_str()
-                << ": " << ErrnoError::SearchErrorMsg(errno));
+                << ": " << strerror(errno));
       }
       else
       {

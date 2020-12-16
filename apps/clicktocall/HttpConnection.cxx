@@ -8,7 +8,6 @@
 #include <resip/stack/Tuple.hxx>
 #include <rutil/DnsUtil.hxx>
 #include <rutil/ParseBuffer.hxx>
-#include <rutil/Errdes.hxx>
 
 #include "Version.hxx"
 #include "AppSubsystem.hxx"
@@ -215,8 +214,6 @@ HttpConnection::processSomeReads()
    if (bytesRead == INVALID_SOCKET)
    {
       int e = getErrno();
-      DebugLog ( << ErrnoError::SearchErrorMsg(e) );
-      
       switch (e)
       {
          case EAGAIN:
@@ -241,7 +238,7 @@ HttpConnection::processSomeReads()
             InfoLog (<< "Some other error");
             break;
       }
-      InfoLog (<< "Failed read on " << (int)mSock << " " << ErrnoError::SearchErrorMsg(e) );
+      InfoLog (<< "Failed read on " << (int)mSock << " " << strerror(e));
       return false;
    }
    else if (bytesRead == 0)
@@ -350,7 +347,7 @@ HttpConnection::processSomeWrites()
    if (bytesWritten == INVALID_SOCKET)
    {
       int e = getErrno();
-      InfoLog (<< "HttpConnection failed write on " << mSock << " " << ErrnoError::SearchErrorMsg(e) );
+      InfoLog (<< "HttpConnection failed write on " << mSock << " " << strerror(e));
 
       return false;
    }

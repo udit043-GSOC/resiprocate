@@ -36,7 +36,6 @@
 #include "rutil/Socket.hxx"
 #include "rutil/FdPoll.hxx"
 #include "rutil/WinLeakCheck.hxx"
-#include "rutil/Errdes.hxx"
 #include "rutil/dns/DnsStub.hxx"
 #ifdef USE_NETNS
 #   include "rutil/NetNs.hxx"
@@ -656,7 +655,7 @@ TransportSelector::getFirstInterface(bool is_v4, TransportType type)
    {
       int e = getErrno();
       Transport::error( e );
-      InfoLog(<< "Can't query local hostname : [" << e << "] " << ErrnoError::SearchErrorMsg(e) );
+      InfoLog(<< "Can't query local hostname : [" << e << "] " << strerror(e) );
       throw Transport::Exception("Can't query local hostname", __FILE__, __LINE__);
    }
    InfoLog(<< "Local hostname is [" << hostname << "]");
@@ -828,7 +827,7 @@ TransportSelector::determineSourceInterface(SipMessage* msg, const Tuple& target
       {
          int e = getErrno();
          Transport::error( e );
-         InfoLog(<< "Unable to route to " << target << " : [" << e << "] " << ErrnoError::SearchErrorMsg(e) );
+         InfoLog(<< "Unable to route to " << target << " : [" << e << "] " << strerror(e) );
          throw Transport::Exception("Can't find source address for Via", __FILE__,__LINE__);
       }
 
@@ -838,7 +837,7 @@ TransportSelector::determineSourceInterface(SipMessage* msg, const Tuple& target
       {
          int e = getErrno();
          Transport::error(e);
-         InfoLog(<< "Can't determine name of socket " << target << " : " << ErrnoError::SearchErrorMsg(e) );
+         InfoLog(<< "Can't determine name of socket " << target << " : " << strerror(e) );
          throw Transport::Exception("Can't find source address for Via", __FILE__,__LINE__);
       }
 
@@ -889,11 +888,10 @@ TransportSelector::determineSourceInterface(SipMessage* msg, const Tuple& target
       if ( ret<0 )
       {
          int e =  getErrno();
-         DebugLog ( << ErrnoError::SearchErrorMsg(e) );
          //.dcm. OS X 10.5 workaround, we could #ifdef for specific OS X version.
          if  (!(e ==EAFNOSUPPORT || e == EADDRNOTAVAIL))
          {
-            ErrLog(<< "Can't disconnect socket :  " << ErrnoError::SearchErrorMsg(e) );
+            ErrLog(<< "Can't disconnect socket :  " << strerror(e) );
             Transport::error(e);
             throw Transport::Exception("Can't disconnect socket", __FILE__,__LINE__);
          }

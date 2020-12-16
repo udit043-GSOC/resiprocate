@@ -12,7 +12,6 @@
 #include "rutil/DnsUtil.hxx"
 #include "rutil/Logger.hxx"
 #include "rutil/ParseBuffer.hxx"
-#include "rutil/Errdes.hxx"
 
 #include "resip/stack/ConnectionTerminated.hxx"
 #include "resip/stack/KeepAlivePong.hxx"
@@ -87,26 +86,25 @@ Transport::onReload()
 void
 Transport::error(int e)
 {
-   DebugLog ( << ErrnoError::SearchErrorMsg(e) );
    switch (e)
    {
       case EAGAIN:
          //InfoLog (<< "No data ready to read" << strerror(e));
          break;
       case EINTR:
-         InfoLog (<< "The call was interrupted by a signal before any data was read : " << ErrnoError::SearchErrorMsg(e));
+         InfoLog (<< "The call was interrupted by a signal before any data was read : " << strerror(e));
          break;
       case EIO:
-         InfoLog (<< "I/O error : " << ErrnoError::SearchErrorMsg(e));
+         InfoLog (<< "I/O error : " << strerror(e));
          break;
       case EBADF:
-         InfoLog (<< "fd is not a valid file descriptor or is not open for reading : " << ErrnoError::SearchErrorMsg(e));
+         InfoLog (<< "fd is not a valid file descriptor or is not open for reading : " << strerror(e));
          break;
       case EINVAL:
-         InfoLog (<< "fd is attached to an object which is unsuitable for reading : " << ErrnoError::SearchErrorMsg(e));
+         InfoLog (<< "fd is attached to an object which is unsuitable for reading : " << strerror(e));
          break;
       case EFAULT:
-         InfoLog (<< "buf is outside your accessible address space : " << ErrnoError::SearchErrorMsg(e));
+         InfoLog (<< "buf is outside your accessible address space : " << strerror(e));
          break;
 
 #if defined(WIN32)
@@ -204,7 +202,7 @@ Transport::error(int e)
 #endif
 
       default:
-         InfoLog (<< "Some other error (" << e << "): " << ErrnoError::SearchErrorMsg(e));
+         InfoLog (<< "Some other error (" << e << "): " << strerror(e));
          break;
    }
 }

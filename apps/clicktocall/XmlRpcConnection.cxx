@@ -8,7 +8,6 @@
 #include <resip/stack/Tuple.hxx>
 #include <rutil/DnsUtil.hxx>
 #include <rutil/ParseBuffer.hxx>
-#include <rutil/Errdes.hxx>
 
 #include "Version.hxx"
 #include "AppSubsystem.hxx"
@@ -108,7 +107,7 @@ XmlRpcConnection::processSomeReads()
    {
       int e = getErrno();
       XmlRpcServerBase::logSocketError(e);
-      InfoLog (<< "XmlRpcConnection::processSomeReads: Failed read on " << (int)mSock << " " << ErrnoError::SearchErrorMsg(e) );
+      InfoLog (<< "XmlRpcConnection::processSomeReads: Failed read on " << (int)mSock);
       return false;
    }
    else if(bytesRead == 0)
@@ -192,7 +191,7 @@ XmlRpcConnection::processSomeWrites()
    {
       int e = getErrno();
       XmlRpcServerBase::logSocketError(e);
-      InfoLog (<< "XmlRpcConnection::processSomeWrites - failed write on " << mSock << " " << ErrnoError::SearchErrorMsg(e) );
+      InfoLog (<< "XmlRpcConnection::processSomeWrites - failed write on " << mSock << " " << strerror(e));
 
       return false;
    }

@@ -9,7 +9,6 @@
 #include "rutil/DnsUtil.hxx"
 #include "rutil/Logger.hxx"
 #include "rutil/NetNs.hxx"
-#include "rutil/Errdes.hxx"
 #include "resip/stack/TcpBaseTransport.hxx"
 
 #define RESIPROCATE_SUBSYSTEM Subsystem::TRANSPORT
@@ -83,7 +82,7 @@ TcpBaseTransport::init()
 #endif
    {
        int e = getErrno();
-       InfoLog (<< "Couldn't set sockoptions SO_REUSEPORT | SO_REUSEADDR: " << ErrnoError::SearchErrorMsg(e) );
+       InfoLog (<< "Couldn't set sockoptions SO_REUSEPORT | SO_REUSEADDR: " << strerror(e));
        error(e);
        throw Exception("Failed setsockopt", __FILE__,__LINE__);
    }
@@ -99,7 +98,7 @@ TcpBaseTransport::init()
    if (e != 0 )
    {
       int e = getErrno();
-      InfoLog (<< "Failed listen " << ErrnoError::SearchErrorMsg(e) );
+      InfoLog (<< "Failed listen " << strerror(e));
       error(e);
       // !cj! deal with errors
       throw Transport::Exception("Address already in use", __FILE__,__LINE__);
@@ -160,7 +159,6 @@ TcpBaseTransport::processListen()
       if ( sock == SOCKET_ERROR )
       {
          int e = getErrno();
-         DebugLog ( << ErrnoError::SearchErrorMsg(e) );
          switch (e)
          {
             case EAGAIN:
@@ -223,7 +221,7 @@ TcpBaseTransport::makeOutgoingConnection(const Tuple &dest,
    if ( sock == INVALID_SOCKET ) // no socket found - try to free one up and try again
    {
       int err = getErrno();
-      InfoLog (<< "Failed to create a socket " << ErrnoError::SearchErrorMsg(err) );
+      InfoLog (<< "Failed to create a socket " << strerror(err));
       error(err);
       if(mConnectionManager.gc(ConnectionManager::MinimumGcAge, 1) == 0)
       {
@@ -237,7 +235,7 @@ TcpBaseTransport::makeOutgoingConnection(const Tuple &dest,
       if ( sock == INVALID_SOCKET )
       {
          err = getErrno();
-         WarningLog( << "Error in finding free filedescriptor to use. " << ErrnoError::SearchErrorMsg(err) );
+         WarningLog( << "Error in finding free filedescriptor to use. " << strerror(err));
          error(err);
          failReason = TransportFailure::TransportNoSocket;
          failSubCode = err;
@@ -278,7 +276,6 @@ TcpBaseTransport::makeOutgoingConnection(const Tuple &dest,
    if (ret == SOCKET_ERROR)
    {
       int err = getErrno();
-      DebugLog ( << ErrnoError::SearchErrorMsg(err) );
 
       switch (err)
       {
@@ -291,7 +288,7 @@ TcpBaseTransport::makeOutgoingConnection(const Tuple &dest,
          default:
          {
             // !jf! this has failed
-            InfoLog( << "Error on TCP connect to " <<  dest << ", err=" << err << ": " << ErrnoError::SearchErrorMsg(err) );
+            InfoLog( << "Error on TCP connect to " <<  dest << ", err=" << err << ": " << strerror(err));
             error(err);
             //fdset.clear(sock);
             closeSocket(sock);
@@ -430,7 +427,7 @@ TcpBaseTransport::processPollEvent(FdPollEventMask mask)
 void
 TcpBaseTransport::setRcvBufLen(int buflen)
 {
-   resip_assert(0);  // not implemented yet
+   resip_assert(0);	// not implemented yet
    // need to store away the length and use when setting up new connections
 }
 

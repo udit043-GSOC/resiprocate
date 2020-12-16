@@ -14,7 +14,6 @@
 #include "rutil/DnsUtil.hxx"
 #include "rutil/Logger.hxx"
 #include "rutil/WinLeakCheck.hxx"
-#include "rutil/Errdes.hxx"
 
 using namespace resip;
 using namespace std;
@@ -99,7 +98,7 @@ InternalTransport::socket(TransportType type, IpVersion ipVer)
    if ( fd == INVALID_SOCKET )
    {
       int e = getErrno();
-      ErrLog (<< "Failed to create socket: " << ErrnoError::SearchErrorMsg(e));
+      ErrLog (<< "Failed to create socket: " << strerror(e));
       throw Transport::Exception("Can't create TcpBaseTransport", __FILE__,__LINE__);
    }
 
@@ -111,7 +110,7 @@ InternalTransport::socket(TransportType type, IpVersion ipVer)
       if ( ::setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &on, sizeof(on)) )
       {
           int e = getErrno();
-          InfoLog (<< "Couldn't set sockoptions IPV6_V6ONLY: " << ErrnoError::SearchErrorMsg(e));
+          InfoLog (<< "Couldn't set sockoptions IPV6_V6ONLY: " << strerror(e));
           error(e);
           throw Exception("Failed setsockopt", __FILE__,__LINE__);
       }
@@ -137,7 +136,6 @@ InternalTransport::bind()
    if ( ::bind( mFd, &mTuple.getMutableSockaddr(), mTuple.length()) == SOCKET_ERROR )
    {
       int e = getErrno();
-      DebugLog ( << ErrnoError::SearchErrorMsg(e) );
       if ( e == EADDRINUSE )
       {
          error(e);
@@ -159,7 +157,7 @@ InternalTransport::bind()
       if (::getsockname(mFd, &mTuple.getMutableSockaddr(), &len) == SOCKET_ERROR)
       {
          int e = getErrno();
-         ErrLog (<<"getsockname failed, error=" << ErrnoError::SearchErrorMsg(e));
+         ErrLog (<<"getsockname failed, error=" << e);
          throw Transport::Exception("Could not query port", __FILE__,__LINE__);
       }
    }

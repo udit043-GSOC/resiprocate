@@ -27,17 +27,13 @@
 #include <rutil/Logger.hxx>
 #include <resip/recon/SipXHelper.hxx>
 
-#include "rutil/Errdes.hxx"
+
 #include "Protocol.hxx"
 
 using namespace tr;
 
 int main(int argc, char *argv[])
 {
-   //Creating an error map for OS and SSL error numbers
-   ErrnoError::CreateMappingErrorMsg();
-   OpenSSLError::CreateMappingErrorMsg();
-
    QCoreApplication app(argc, argv);
    app.setApplicationName(QLatin1String("telepathy-resiprocate"));
 
